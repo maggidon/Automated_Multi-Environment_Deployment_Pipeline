@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: shafaque26/dockerimage
+  repository: maggidon/dockerimage
   tag: "latest"
   pullPolicy: Always
 
