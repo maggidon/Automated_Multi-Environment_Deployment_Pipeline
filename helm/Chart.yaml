@@ -1,0 +1,4 @@
+apiVersion: v2
+name: devops-node-app
+description: A Helm chart for Node.js API
+version: 0.1.0

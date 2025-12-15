@@ -1,0 +1,91 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = "shafaque26/dockerimage"
+        DOCKERHUB_PASSWORD = credentials('dockerhub-creds')  // Your DockerHub credentials
+        DOCKER_CLI = "/usr/local/bin/docker"  // Docker path
+        CONTAINER_NAME = "my-running-container"  // Running container name
+        GITHUB_TOKEN = credentials('github-token')  // GitHub token credential ID
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                echo "Cloning the repository..."
+                git url: "https://github.com/mohdshafaquearif/Multi-Environment-Deployment.git"
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker image: ${DOCKER_IMAGE}:latest"
+                script {
+                    sh "${DOCKER_CLI} build -t ${DOCKER_IMAGE}:latest app"
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                echo "Logging in to DockerHub and pushing image..."
+                script {
+                    sh """
+                        echo '${DOCKERHUB_PASSWORD}' | ${DOCKER_CLI} login --username shafaque26 --password-stdin
+                        ${DOCKER_CLI} push ${DOCKER_IMAGE}:latest
+                        ${DOCKER_CLI} logout
+                    """
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                echo "Running Docker container from image: ${DOCKER_IMAGE}:latest"
+                script {
+                    sh """
+                        ${DOCKER_CLI} rm -f ${CONTAINER_NAME} || true
+                        ${DOCKER_CLI} run -d --name ${CONTAINER_NAME} -p 3000:3000 ${DOCKER_IMAGE}:latest
+                    """
+                }
+            }
+        }
+
+        stage('Update Helm values & Git Push') {
+            steps {
+                script {
+                    
+                    sh """
+                        # Detect sed version and use correct syntax
+                        if sed --version >/dev/null 2>&1; then
+                            # GNU sed (Linux)
+                            sed -i "s|tag:.*|tag: latest"|" helm/values.yaml
+                        else
+                            # BSD sed (macOS)
+                            sed -i '' "s|tag:.*|tag: latest"|" helm/values.yaml
+                        fi
+
+                        git config user.email "mohammadshafaque.26@gmail.com"
+                        git config user.name "Mohammad Shafaque Arif"
+
+                        # Correct GitHub URL (no double colon)
+                        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/mohdshafaquearif/Multi-Environment-Deployment.git
+
+                        git add helm/values.yaml || true
+                        git commit -m "Update image tag to latest [CI SKIP]" || echo "No changes to commit"
+                        git push origin master
+                    """
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "Docker image pushed, Helm values updated, and container running successfully."
+        }
+        failure {
+            echo "Pipeline failed. Please check logs."
+        }
+    }
+}

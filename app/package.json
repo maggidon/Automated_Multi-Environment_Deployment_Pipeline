@@ -1,0 +1,1 @@
+{"name":"devops-pipeline-app","version":"1.0.0","description":"Sample Node.js API for CI/CD Pipeline","main":"app.js","scripts":{"start":"node app.js","test":"echo No tests yet"},"dependencies":{"express":"^4.21.2","node":"^20.19.4"}}

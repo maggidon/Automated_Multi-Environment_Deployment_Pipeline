@@ -1,0 +1,12 @@
+replicaCount: 1
+
+image:
+  repository: shafaque26/dockerimage
+  tag: "latest"
+  pullPolicy: Always
+
+service:
+  type: NodePort
+  port: 3000
+
+containerPort: 3000
