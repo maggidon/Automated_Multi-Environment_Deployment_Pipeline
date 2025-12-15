@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "shafaque26/dockerimage"
+        DOCKER_IMAGE = "maggidon/dockerimage"
         DOCKERHUB_PASSWORD = credentials('dockerhub-creds')  // Your DockerHub credentials
         DOCKER_CLI = "/usr/local/bin/docker"  // Docker path
         CONTAINER_NAME = "my-running-container"  // Running container name
@@ -13,7 +13,7 @@ pipeline {
         stage('Checkout Code') {
             steps {
                 echo "Cloning the repository..."
-                git url: "https://github.com/mohdshafaquearif/Multi-Environment-Deployment.git"
+                git url: "https://github.com/maggidon/Automated_Multi-Environment_Deployment_Pipeline.git"
             }
         }
 
@@ -65,11 +65,11 @@ pipeline {
                             sed -i '' "s|tag:.*|tag: latest"|" helm/values.yaml
                         fi
 
-                        git config user.email "mohammadshafaque.26@gmail.com"
-                        git config user.name "Mohammad Shafaque Arif"
+                        git config user.email "deeardey25@gmail.com"
+                        git config user.name "maggidon"
 
                         # Correct GitHub URL (no double colon)
-                        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/mohdshafaquearif/Multi-Environment-Deployment.git
+                        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/maggidon/Automated_Multi-Environment_Deployment_Pipeline.git
 
                         git add helm/values.yaml || true
                         git commit -m "Update image tag to latest [CI SKIP]" || echo "No changes to commit"
