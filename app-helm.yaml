@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/mohdshafaquearif/Multi-Environment-Deployment.git'
+    repoURL: 'https://github.com/maggidon/Automated_Multi-Environment_Deployment_Pipeline.git'
     targetRevision: HEAD
     path: helm
     helm:
